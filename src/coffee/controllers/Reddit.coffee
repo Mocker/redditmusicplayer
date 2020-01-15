@@ -51,21 +51,23 @@ Reddit = Backbone.Model.extend
 		if Store.firstRequest
 			$.ajax
 				dataType: 'json'
-				url: "/api/get/r/#{subs}/#{@get('sortMethod')}.json?jsonp=?"
+				url: "/api/get/r/#{subs}/#{@get('sortMethod')}.json"
 				data: data
 				success: (r) ->
 					throw new Error "Reddit :: #{r.error.type} :: #{r.error.message}" if r.error?
-					callback r.data.children
+					songs = r.data.children.filter Store.filterFunction
+					callback songs
 			Store.firstRequest = false
 		else
 			$.ajax
 				dataType: 'json'
-				url: "#{API.Reddit.base}/r/#{subs}/#{@get('sortMethod')}.json?jsonp=?"
+				url: "/api/get/r/#{subs}/#{@get('sortMethod')}.json"
 				data: data
 				success: (r) ->
 					throw new Error "Reddit :: #{r.error.type} :: #{r.error.message}" if r.error?
 					console.log 'Reddit :: Music Received :: ', r.data.children.length if FLAG_DEBUG
-					callback r.data.children
+					songs = r.data.children.filter Store.filterFunction
+					callback songs
 				error: (xhr, status, err) ->
 					console.error "Reddit :: #{status} :: #{err}", arguments
 					Dispatcher.trigger Constants.MESSAGE, new MessageFailedToGetMusic()
@@ -75,11 +77,12 @@ Reddit = Backbone.Model.extend
 		console.log 'Reddit :: GetSearch ::', @get('search') if FLAG_DEBUG
 		$.ajax
 			dataType: 'json'
-			url: "#{API.Reddit.base}/search.json?q=#{@get('search')}&jsonp=?"
+			url: "/api/get/search.json?q=#{@get('search')}"
 			data: data
 			success: (r) ->
 				throw console.error "Reddit :: #{r.error.type} :: #{r.error.message}" if r.error?
-				callback r.data.children
+				songs = r.data.children.filter Store.filterFunction
+				callback songs
 
 	getMulti: (callback, data) ->
 		if not @has('multi')
@@ -87,11 +90,12 @@ Reddit = Backbone.Model.extend
 		console.log 'Reddit :: GetMulti ::', @get('multi') if FLAG_DEBUG
 		$.ajax
 			dataType: 'json'
-			url: "#{API.Reddit.base}/user/#{@get('multi')}/#{@get('sortMethod')}.json?jsonp=?"
+			url: "/api/get/user/#{@get('multi')}/#{@get('sortMethod')}.json"
 			data: data
 			success: (r) ->
 				throw new Error "Reddit :: #{r.error.type} :: #{r.error.message}" if r.error?
-				callback r.data.children
+				songs = r.data.children.filter Store.filterFunction
+				callback songs
 
 	getMore: (last, callback) ->
 		@getMusic callback, last, 20
@@ -100,7 +104,7 @@ Reddit = Backbone.Model.extend
 		data = {}
 		data.sort = @get('sortMethod')
 		data.t = @get('topMethod') if @get('sortMethod') is 'top'
-		url = "#{API.Reddit.base}#{permalink}.json?jsonp=?"
+		url = "/api/get/#{permalink}.json"
 		url = '/api/comments' if Store.authentication?
 		data.permalink = permalink if Store.authentication?
 		$.ajax

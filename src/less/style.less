@@ -77,22 +77,21 @@ a {
 /* Scrollbar */
 ::-webkit-scrollbar {
 	margin-right: 1px;
-    width: 8px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar:vertical {
 	background: fade(@col-fg, 10%);
-	// .transition(0.15s, ease-out);
 }
 
-:-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     border-radius: 100px;
-    background: fade(@col-fg, 15%);
+    background: fade(@col-primary, 50%);
     &:hover {
-    	background: fade(@col-fg, 10%);
+    	background: fade(@col-primary, 75%);
     }
     &:active {
-    	background: fade(@col-fg, 5%);
+    	background: @col-primary;
     }
 }
 
@@ -534,8 +533,8 @@ a {
 	.current.song {
 		.ui.header {
 			margin: 0px;
-			margin-left: 2em;
 			padding: .7em 0;
+			text-align: center;
 		}
 		.ui.statistics {
 			text-align: center;
@@ -547,23 +546,31 @@ a {
 					text-transform: none;
 					min-height: 0;
 					font-size: 1rem;
+					display: block;
+				}
+				.label {
+					display: block;
+				}
+			}
+		}
+		.actions {
+			.statistic {
+				opacity: .9;
+				transition: 100ms opacity, 100ms transform;
+				&:hover, &:focus {
+					opacity: 1;
+				}
+				&:active {
+					transform: scale(1.05);
 				}
 			}
 		}
 		.vote {
-			display: block;
-			float: left;
-			padding-right: .5em;
-			font-size: 1.5em;
 			.upvote, .downvote {
 				cursor: pointer;
-				display: block;
-				margin: 0em auto;
-				width: 1em;
-				height: 1em;
 			}
 			.upvote {
-				&.active {
+				&.active .value {
 					color: orangered;
 				}
 				&:hover, &:focus {
@@ -571,7 +578,7 @@ a {
 				}
 			}
 			.downvote {
-				&.active {
+				&.active .value {
 					color: #5f99cf;
 				}
 				&:hover, &:focus {

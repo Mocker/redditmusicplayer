@@ -15,6 +15,16 @@ SoundCloudPlayer = MusicPlayer.extend
 		'play': @event_trigger(Constants.PLAYING)
 		'pause': @event_trigger(Constants.PAUSED)
 		'finish': @onFinish.bind @
+		'ready': @ready.bind @
+		'error': @error.bind @
+
+	ready: () ->
+		console.log 'SoundCloudPlayer :: Ready' if FLAG_DEBUG
+		@player.play()
+
+	error: (err) ->
+		console.error 'SoundCloudPlayer :: Error ::', err if FLAG_DEBUG
+		Dispatcher.trigger Constants.CONTROLS_FORWARD
 
 	progress_play: (data) ->
 		Dispatcher.trigger Constants.PROGRESS_CURRENT, data.currentPosition / 1000 # secs
@@ -34,7 +44,7 @@ SoundCloudPlayer = MusicPlayer.extend
 
 	event_trigger: (ev) ->
 		return (data) =>
-			@player.setVolume(VolumeControl.get('volume')) # didn't work on ready event
+			@player.setVolume(VolumeControl.get('volume') * 100) # didn't work on ready event
 			@player.getDuration (duration) ->
 				Dispatcher.trigger Constants.PROGRESS_DURATION, duration / 1000 # secs
 			@playerState = ev
@@ -46,7 +56,7 @@ SoundCloudPlayer = MusicPlayer.extend
 		@player.toggle()
 
 	volume: (value) ->
-		@player.setVolume(value)
+		@player.setVolume(value * 100)
 
 	seekTo: (percentage, seekAhead) ->
 		@player.getDuration (duration) =>
